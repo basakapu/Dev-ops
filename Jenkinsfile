@@ -4,7 +4,7 @@ pipeline {
      DOCKER_REGISTRY = "registry.devops:5000"
      VAULT_ADDR = "http://vault.devops:8200"
      VAULT_PATH_MYSQL="kv/mysql/db"
-     VAULT_TOKEN_MYSQL="s.E6WxeDlyHOkJcDDrgE0E39fu"
+     VAULT_TOKEN_MYSQL="s.GD4wXYOkX2tmBM9a8sy9Ugqb"
      MYSQL_STAGING_URL="staging.devops:3306"
      MYSQL_PROD_URL="production.devops:3306"
      MYSQL_DB_NAME="test"
@@ -12,6 +12,12 @@ pipeline {
      MYSQL_DB_USER="test"
      MYSQL_DB_ROOT="tooor"
    }
+   pipeline{
+  stage('com'){
+    def mvnHome = tool name: 'Apache Maven 3.6.0', type: 'maven'
+    sh "${mvnHome}/bin/mvn -B -DskipTests clean package"
+  }
+}
    stages {
       stage('Build') {
          steps {
@@ -65,8 +71,8 @@ pipeline {
                      docker build --no-cache --build-arg STAGE=staging -t "devops/ui:staging" -f frontend/Dockerfile .
                      docker tag "devops/ui:staging" "${DOCKER_REGISTRY}/devops/ui:staging"
                      docker push "${DOCKER_REGISTRY}/devops/ui:staging"
-                     docker rmi "${DOCKER_REGISTRY}/devops/ui:staging"
-                     docker rmi "devops/ui:staging"
+                     docker rmi -f "${DOCKER_REGISTRY}/devops/ui:staging"
+                     docker rmi -f "devops/ui:staging"
                   '''
                },
                api: {
